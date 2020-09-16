@@ -22,8 +22,6 @@ func main() {
 			"tf": pashua.PashuaTextField{
 				Label:   "Gib was ein",
 				Default: "42",
-				Width:   100,
-				Y:       20,
 			},
 			"cb": pashua.PashuaCombobox{
 				Label:          "My combobox label",
@@ -31,7 +29,6 @@ func main() {
 				Width:          220,
 				Tooltip:        "Choose from the list",
 				CompletionMode: pashua.CaseInsensitive,
-				Y:              60,
 			},
 			"dt": pashua.PashuaDate{
 				Label:   "TickTock",
@@ -40,7 +37,6 @@ func main() {
 				UseTime: false,
 				Default: "2020-07-04",
 				Textual: false,
-				Y:       120,
 			},
 			"ok": pashua.PashuaDefaultButton{
 				Label:   "OK",
