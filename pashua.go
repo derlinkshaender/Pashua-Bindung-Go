@@ -29,6 +29,14 @@ const (
 	Mini             = "mini"
 )
 
+// Position can be used to set an element's absolute position or move it relatively
+type Position struct {
+	X    int
+	Y    int
+	RelX int
+	RelY int
+}
+
 // PashuaButton is a structure that holds all information for a PashuaButton
 type PashuaButton struct {
 	Label    string
@@ -51,10 +59,7 @@ type PashuaCheckbox struct {
 	Default  bool
 	Disabled bool
 	Tooltip  string
-	X        int
-	Y        int
-	RelX     int
-	RelY     int
+	Position
 }
 
 // PashuaCombobox is a structure that holds all information for a PashuaCombobox
@@ -68,10 +73,7 @@ type PashuaCombobox struct {
 	Disabled       bool
 	Tooltip        string
 	Width          int
-	X              int
-	Y              int
-	RelX           int
-	RelY           int
+	Position
 }
 
 // PashuaDate is a structure that holds all information for a PashuaDate
@@ -83,8 +85,7 @@ type PashuaDate struct {
 	Default  string
 	Disabled bool
 	Tooltip  string
-	X        int
-	Y        int
+	Position
 }
 
 // PashuaDefaultButton is a structure that holds all information for a PashuaDefaultButton
@@ -105,10 +106,7 @@ type PashuaImage struct {
 	MaxHeight int
 	UpScale   bool
 	Tooltip   string
-	X         int
-	Y         int
-	RelX      int
-	RelY      int
+	Position
 }
 
 // PashuaOpenBrowser is a structure that holds all information for a PashuaOpenBrowser
@@ -119,10 +117,7 @@ type PashuaOpenBrowser struct {
 	Filetype    string
 	Placeholder string
 	Mandatory   bool
-	X           int
-	Y           int
-	RelX        int
-	RelY        int
+	Position
 }
 
 // PashuaPassword is a structure that holds all information for a PashuaPassword
@@ -133,10 +128,7 @@ type PashuaPassword struct {
 	Mandatory bool
 	Tooltip   string
 	Width     int
-	X         int
-	Y         int
-	RelX      int
-	RelY      int
+	Position
 }
 
 // PashuaPopup is a structure that holds all information for a PashuaPopup
@@ -148,10 +140,7 @@ type PashuaPopup struct {
 	Tooltip   string
 	Mandatory bool
 	Width     int
-	X         int
-	Y         int
-	RelX      int
-	RelY      int
+	Position
 }
 
 // PashuaRadioButton is a structure that holds all information for a PashuaRadioButton
@@ -162,10 +151,7 @@ type PashuaRadioButton struct {
 	Disabled  bool
 	Tooltip   string
 	Mandatory bool
-	X         int
-	Y         int
-	RelX      int
-	RelY      int
+	Position
 }
 
 // PashuaSaveBrowser is a structure that holds all information for a PashuaSaveBrowser
@@ -176,10 +162,7 @@ type PashuaSaveBrowser struct {
 	Filetype    string
 	Placeholder string
 	Mandatory   bool
-	X           int
-	Y           int
-	RelX        int
-	RelY        int
+	Position
 }
 
 // PashuaText is a structure that holds all information for a PashuaText
@@ -188,10 +171,7 @@ type PashuaText struct {
 	Text    string
 	Tooltip string
 	Width   int
-	X       int
-	Y       int
-	RelX    int
-	RelY    int
+	Position
 }
 
 // PashuaTextBox is a structure that holds all information for a PashuaTextBox
@@ -205,10 +185,7 @@ type PashuaTextBox struct {
 	Disabled  bool
 	Width     int
 	Height    int
-	X         int
-	Y         int
-	RelX      int
-	RelY      int
+	Position
 }
 
 // PashuaTextField is a structure that holds all information for a PashuaTextField
@@ -219,10 +196,7 @@ type PashuaTextField struct {
 	Mandatory bool
 	Disabled  bool
 	Width     int
-	X         int
-	Y         int
-	RelX      int
-	RelY      int
+	Position
 }
 
 // PashuaComponents is type for th elist of components contained in a Pashua window
@@ -317,6 +291,23 @@ func RunPashuaWithStruct(pashuaWindow *PashuaWindow, pashuaPath string) (map[str
 	return RunPashua(configString, pashuaPath)
 }
 
+func appendPositionalAttributes(def []string, name string, txt *Position) []string {
+	if "0" != getFieldValue(txt.X) {
+		def = append(def, name+".x="+getFieldValue(txt.X))
+	}
+	if "0" != getFieldValue(txt.Y) {
+		def = append(def, name+".y="+getFieldValue(txt.Y))
+	}
+	if "0" != getFieldValue(txt.RelX) {
+		def = append(def, name+".relx="+getFieldValue(txt.RelX))
+	}
+	if "0" != getFieldValue(txt.RelY) {
+		def = append(def, name+".rely="+getFieldValue(txt.RelY))
+	}
+
+	return def
+}
+
 // parsePashuaOutput takes a list of lines and
 // converts key=value pairs to a map and
 // skips empty lines of lines without an "="
@@ -399,8 +390,7 @@ func (btn *PashuaDate) ToString(key string) string {
 	result = append(result, key+".date="+getFieldValue(btn.UseDate))
 	result = append(result, key+".time="+getFieldValue(btn.UseTime))
 	result = append(result, key+".textual="+getFieldValue(btn.Textual))
-	result = append(result, key+".x="+getFieldValue(btn.X))
-	result = append(result, key+".y="+getFieldValue(btn.Y))
+	result = appendPositionalAttributes(result, key, &btn.Position)
 	return strings.Join(result, "\n")
 }
 
@@ -426,10 +416,7 @@ func (txt *PashuaCheckbox) ToString(key string) string {
 	result = append(result, key+".default="+getFieldValue(txt.Default))
 	result = append(result, key+".disabled="+getFieldValue(txt.Disabled))
 	result = append(result, key+".tooltip="+getFieldValue(txt.Tooltip))
-	result = append(result, key+".x="+getFieldValue(txt.X))
-	result = append(result, key+".y="+getFieldValue(txt.Y))
-	result = append(result, key+".relx="+getFieldValue(txt.RelX))
-	result = append(result, key+".rely="+getFieldValue(txt.RelY))
+	result = appendPositionalAttributes(result, key, &txt.Position)
 	return strings.Join(result, "\n")
 }
 
@@ -440,10 +427,7 @@ func (txt *PashuaCombobox) ToString(key string) string {
 	result = append(result, key+".tooltip="+getFieldValue(txt.Tooltip))
 	result = append(result, key+".width="+getFieldValue(txt.Width))
 	result = append(result, key+".rows="+getFieldValue(txt.Rows))
-	result = append(result, key+".x="+getFieldValue(txt.X))
-	result = append(result, key+".y="+getFieldValue(txt.Y))
-	result = append(result, key+".relx="+getFieldValue(txt.RelX))
-	result = append(result, key+".rely="+getFieldValue(txt.RelY))
+	result = appendPositionalAttributes(result, key, &txt.Position)
 	result = append(result, key+".placeholder="+getFieldValue(txt.Placeholder))
 	result = append(result, key+".mandatory="+getFieldValue(txt.Mandatory))
 	result = append(result, key+".completion="+getFieldValue(txt.CompletionMode))
@@ -463,10 +447,7 @@ func (txt *PashuaImage) ToString(key string) string {
 	result = append(result, key+".maxwidth="+getFieldValue(txt.MaxWidth))
 	result = append(result, key+".maxheight="+getFieldValue(txt.MaxHeight))
 	result = append(result, key+".upscale="+getFieldValue(txt.UpScale))
-	result = append(result, key+".x="+getFieldValue(txt.X))
-	result = append(result, key+".y="+getFieldValue(txt.Y))
-	result = append(result, key+".relx="+getFieldValue(txt.RelX))
-	result = append(result, key+".rely="+getFieldValue(txt.RelY))
+	result = appendPositionalAttributes(result, key, &txt.Position)
 	return strings.Join(result, "\n")
 }
 
@@ -478,10 +459,7 @@ func (txt *PashuaOpenBrowser) ToString(key string) string {
 	result = append(result, key+".width="+getFieldValue(txt.Width))
 	result = append(result, key+".mandatory="+getFieldValue(txt.Mandatory))
 	result = append(result, key+".placeholder="+getFieldValue(txt.Placeholder))
-	result = append(result, key+".x="+getFieldValue(txt.X))
-	result = append(result, key+".y="+getFieldValue(txt.Y))
-	result = append(result, key+".relx="+getFieldValue(txt.RelX))
-	result = append(result, key+".rely="+getFieldValue(txt.RelY))
+	result = appendPositionalAttributes(result, key, &txt.Position)
 	return strings.Join(result, "\n")
 }
 
@@ -493,10 +471,7 @@ func (txt *PashuaSaveBrowser) ToString(key string) string {
 	result = append(result, key+".width="+getFieldValue(txt.Width))
 	result = append(result, key+".mandatory="+getFieldValue(txt.Mandatory))
 	result = append(result, key+".placeholder="+getFieldValue(txt.Placeholder))
-	result = append(result, key+".x="+getFieldValue(txt.X))
-	result = append(result, key+".y="+getFieldValue(txt.Y))
-	result = append(result, key+".relx="+getFieldValue(txt.RelX))
-	result = append(result, key+".rely="+getFieldValue(txt.RelY))
+	result = appendPositionalAttributes(result, key, &txt.Position)
 	return strings.Join(result, "\n")
 }
 
@@ -508,10 +483,7 @@ func (txt *PashuaPassword) ToString(key string) string {
 	result = append(result, key+".default="+getFieldValue(txt.Default))
 	result = append(result, key+".disabled="+getFieldValue(txt.Disabled))
 	result = append(result, key+".mandatory="+getFieldValue(txt.Mandatory))
-	result = append(result, key+".x="+getFieldValue(txt.X))
-	result = append(result, key+".y="+getFieldValue(txt.Y))
-	result = append(result, key+".relx="+getFieldValue(txt.RelX))
-	result = append(result, key+".rely="+getFieldValue(txt.RelY))
+	result = appendPositionalAttributes(result, key, &txt.Position)
 	return strings.Join(result, "\n")
 }
 
@@ -523,10 +495,7 @@ func (txt *PashuaPopup) ToString(key string) string {
 	result = append(result, key+".default="+getFieldValue(txt.Default))
 	result = append(result, key+".disabled="+getFieldValue(txt.Disabled))
 	result = append(result, key+".mandatory="+getFieldValue(txt.Mandatory))
-	result = append(result, key+".x="+getFieldValue(txt.X))
-	result = append(result, key+".y="+getFieldValue(txt.Y))
-	result = append(result, key+".relx="+getFieldValue(txt.RelX))
-	result = append(result, key+".rely="+getFieldValue(txt.RelY))
+	result = appendPositionalAttributes(result, key, &txt.Position)
 	for _, k := range txt.Option {
 		result = append(result, key+".option="+getFieldValue(k))
 	}
@@ -540,10 +509,7 @@ func (txt *PashuaRadioButton) ToString(key string) string {
 	result = append(result, key+".default="+getFieldValue(txt.Default))
 	result = append(result, key+".disabled="+getFieldValue(txt.Disabled))
 	result = append(result, key+".mandatory="+getFieldValue(txt.Mandatory))
-	result = append(result, key+".x="+getFieldValue(txt.X))
-	result = append(result, key+".y="+getFieldValue(txt.Y))
-	result = append(result, key+".relx="+getFieldValue(txt.RelX))
-	result = append(result, key+".rely="+getFieldValue(txt.RelY))
+	result = appendPositionalAttributes(result, key, &txt.Position)
 	for _, k := range txt.Option {
 		result = append(result, key+".option="+getFieldValue(k))
 	}
@@ -557,10 +523,7 @@ func (txt *PashuaText) ToString(key string) string {
 	s = strings.Replace(s, "\n", "[return]", -1)
 	result = append(result, key+".text="+s)
 	result = append(result, key+".tooltip="+txt.Tooltip)
-	result = append(result, key+".x="+getFieldValue(txt.X))
-	result = append(result, key+".y="+getFieldValue(txt.Y))
-	result = append(result, key+".relx="+getFieldValue(txt.RelX))
-	result = append(result, key+".rely="+getFieldValue(txt.RelY))
+	result = appendPositionalAttributes(result, key, &txt.Position)
 	return strings.Join(result, "\n")
 }
 
@@ -581,10 +544,7 @@ func (txt *PashuaTextBox) ToString(key string) string {
 	}
 	result = append(result, key+".fonttype="+s)
 	result = append(result, key+".fontsize="+getFieldValue(txt.FontSize))
-	result = append(result, key+".x="+getFieldValue(txt.X))
-	result = append(result, key+".y="+getFieldValue(txt.Y))
-	result = append(result, key+".relx="+getFieldValue(txt.RelX))
-	result = append(result, key+".rely="+getFieldValue(txt.RelY))
+	result = appendPositionalAttributes(result, key, &txt.Position)
 	return strings.Join(result, "\n")
 }
 
@@ -595,10 +555,7 @@ func (txt *PashuaTextField) ToString(key string) string {
 	result = append(result, key+".tooltip="+txt.Tooltip)
 	result = append(result, key+".disabled="+getFieldValue(txt.Disabled))
 	result = append(result, key+".mandatory="+getFieldValue(txt.Mandatory))
-	result = append(result, key+".x="+getFieldValue(txt.X))
-	result = append(result, key+".y="+getFieldValue(txt.Y))
-	result = append(result, key+".relx="+getFieldValue(txt.RelX))
-	result = append(result, key+".rely="+getFieldValue(txt.RelY))
+	result = appendPositionalAttributes(result, key, &txt.Position)
 	return strings.Join(result, "\n")
 }
 
